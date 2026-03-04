@@ -8,16 +8,35 @@ const client = new SecretsManagerClient({
 });
 
 let response;
+let pool;
 
+async function getDB(){
 try {
+    if(pool) return pool;
     response = await client.send(
         new GetSecretValueCommand({
             SecretId : secret_name,
             VersionStage: "AWSCURRENT",
         })
     );
+    const secret = JSON.parse(response.SecretString);
+
+pool = mysql.createPool({
+    host:secret.host,
+    user:secret.username,
+    password : secret.password,
+    database : secret.database,
+    port : secret.port,
+    waitForConnections : true,
+    connectionLimit : 10,
+});
+console.log("Conneted to rds via secret Manager");
+
+return pool;
 } catch(err){
     console.log(err);
 }
+}
 
-const secret = response.SecretString;
+module.exports = getDB;
+

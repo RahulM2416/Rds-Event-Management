@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 const routes = require('./routes/routes');
-app.use('/api',routes);
+app.use('/',routes);
 
 app.listen(process.env.PORT,()=>{
     console.log("Connected to Server..");
